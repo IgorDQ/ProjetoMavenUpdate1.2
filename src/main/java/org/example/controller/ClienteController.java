@@ -4,17 +4,28 @@ import org.example.model.Cliente;
 import org.example.model.ClienteDAO;
 import org.example.model.Endereco;
 import org.example.model.EnderecoDAO;
+
 import java.sql.SQLException;
 import java.util.List;
 
 public class ClienteController {
 
-    private final ClienteDAO clienteDao = new ClienteDAO();
-    private final EnderecoDAO enderecoDao = new EnderecoDAO();
+    private final ClienteDAO clienteDao;
+    private final EnderecoDAO enderecoDao;
+
+
+    public ClienteController() {
+        this(new ClienteDAO(), new EnderecoDAO());
+    }
+
+    // permite injeção de mocks
+    public ClienteController(ClienteDAO clienteDao, EnderecoDAO enderecoDao) {
+        this.clienteDao = clienteDao;
+        this.enderecoDao = enderecoDao;
+    }
 
     public void cadastrar(String nome, int idade, String cidade, Endereco endDados) throws SQLException {
         Cliente cliente = new Cliente(nome, idade, cidade);
-
         int clienteId = clienteDao.salvar(cliente);
 
         if (clienteId == -1) {

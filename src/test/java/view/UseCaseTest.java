@@ -3,7 +3,7 @@ package view;
 import org.example.controller.ClienteController;
 import org.example.model.Cliente;
 import org.example.model.Endereco;
-import org.example.view.ClienteView;
+import org.example.view.UseCase;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,7 @@ import java.util.Scanner;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class ClienteViewTest {
+class UseCaseTest {
 
     private ClienteController controllerMock;
     private final PrintStream originalOut = System.out;
@@ -112,7 +112,7 @@ class ClienteViewTest {
 
         static void cadastrar(Scanner sc, ClienteController controller) throws SQLException {
             try {
-                java.lang.reflect.Method m = ClienteView.class.getDeclaredMethod("cadastrar", Scanner.class, ClienteController.class);
+                java.lang.reflect.Method m = UseCase.class.getDeclaredMethod("cadastrar", Scanner.class, ClienteController.class);
                 m.setAccessible(true);
                 m.invoke(null, sc, controller);
             } catch (Exception e) {
@@ -122,7 +122,7 @@ class ClienteViewTest {
 
         static void listar(ClienteController controller) throws SQLException {
             try {
-                java.lang.reflect.Method m = ClienteView.class.getDeclaredMethod("listar", ClienteController.class);
+                java.lang.reflect.Method m = UseCase.class.getDeclaredMethod("listar", ClienteController.class);
                 m.setAccessible(true);
                 m.invoke(null, controller);
             } catch (Exception e) {
@@ -132,7 +132,7 @@ class ClienteViewTest {
 
         static void buscar(Scanner sc, ClienteController controller) throws SQLException {
             try {
-                java.lang.reflect.Method m = ClienteView.class.getDeclaredMethod("buscar", Scanner.class, ClienteController.class);
+                java.lang.reflect.Method m = UseCase.class.getDeclaredMethod("buscar", Scanner.class, ClienteController.class);
                 m.setAccessible(true);
                 m.invoke(null, sc, controller);
             } catch (Exception e) {

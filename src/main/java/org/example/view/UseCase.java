@@ -3,12 +3,13 @@ package org.example.view;
 import org.example.controller.ClienteController;
 import org.example.model.Cliente;
 import org.example.model.Endereco;
+
 import java.sql.SQLException;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
-public class ClienteView {
+public class UseCase {
 
     private static final ClienteController controller = new ClienteController();
     private static final Scanner sc = new Scanner(System.in);
@@ -97,6 +98,10 @@ public class ClienteView {
         System.out.print("Cidade: ");
         String cidade = sc.nextLine();
 
+        ValidadorCampos.validarNomeOuCidade(nome, "Nome");
+        ValidadorCampos.validarIdade(idade);
+        ValidadorCampos.validarNomeOuCidade(cidade, "Cidade");
+
         System.out.println("\n--- Dados do Endereço ---");
         System.out.print("Logradouro: ");
         String logradouro = sc.nextLine();
@@ -110,6 +115,11 @@ public class ClienteView {
         String uf = sc.nextLine();
         System.out.print("País: ");
         String pais = sc.nextLine();
+
+
+        ValidadorCampos.validarEndereco(logradouro, numero, complemento, municipio, uf, pais);
+        numero = ValidadorCampos.normalizarNumeroOuComplemento(numero);
+        complemento = ValidadorCampos.normalizarNumeroOuComplemento(complemento);
 
         Endereco novoEndereco = new Endereco(logradouro, numero, complemento, municipio, uf, pais);
 
@@ -173,6 +183,7 @@ public class ClienteView {
         System.out.print("Novo Nome (" + clienteExistente.getNome() + "): ");
         String nome = sc.nextLine();
         if (nome.trim().isEmpty()) nome = clienteExistente.getNome();
+        else ValidadorCampos.validarNomeOuCidade(nome, "Nome");
 
         System.out.print("Nova Idade (" + clienteExistente.getIdade() + "): ");
         String idadeStr = sc.nextLine();
@@ -182,6 +193,7 @@ public class ClienteView {
         } else {
             try {
                 idade = Integer.parseInt(idadeStr);
+                ValidadorCampos.validarIdade(idade);
             } catch (NumberFormatException e) {
                 System.out.println("[ERRO] Idade inválida. Operação cancelada.");
                 return;
@@ -191,7 +203,7 @@ public class ClienteView {
         System.out.print("Nova Cidade (" + clienteExistente.getCidade() + "): ");
         String cidade = sc.nextLine();
         if (cidade.trim().isEmpty()) cidade = clienteExistente.getCidade();
-
+        else ValidadorCampos.validarNomeOuCidade(cidade, "Cidade");
 
         Cliente clienteAtualizado = new Cliente(id, nome, idade, cidade, clienteExistente.getEndereco());
 

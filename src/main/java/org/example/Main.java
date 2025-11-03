@@ -1,6 +1,6 @@
 package org.example;
 
-import org.example.view.ClienteView;
+import org.example.view.UseCase;
 
 public class Main {
 
@@ -11,11 +11,12 @@ public class Main {
         System.out.println("Conectando ao sistema...");
 
         try {
-            ClienteView.main(args);
+            UseCase.main(args);
         } catch (Exception e) {
             System.out.println("Erro fatal: " + e.getMessage());
         }
 
         System.out.println("Sistema encerrado.");
     }
+
 }

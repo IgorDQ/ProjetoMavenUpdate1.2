@@ -13,7 +13,6 @@ public class ClienteController {
     private final ClienteDAO clienteDao;
     private final EnderecoDAO enderecoDao;
 
-
     public ClienteController() {
         this(new ClienteDAO(), new EnderecoDAO());
     }
@@ -24,15 +23,16 @@ public class ClienteController {
         this.enderecoDao = enderecoDao;
     }
 
-    public void cadastrar(String nome, int idade, String cidade, Endereco endDados) throws SQLException {
+    public void cadastrar(String nome, int idade, String cidade, Endereco endereco) throws SQLException {
         Cliente cliente = new Cliente(nome, idade, cidade);
+
         int clienteId = clienteDao.salvar(cliente);
 
         if (clienteId == -1) {
             throw new SQLException("Falha ao obter ID do cliente após o cadastro.");
         }
 
-        enderecoDao.salvarComProcedure(clienteId, endDados);
+        enderecoDao.salvarComProcedure(clienteId, endereco);
     }
 
     public List<Cliente> listar() throws SQLException {

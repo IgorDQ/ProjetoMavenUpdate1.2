@@ -5,7 +5,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class ClienteDAO {
 
     public int salvar(Cliente cliente) throws SQLException {
@@ -26,7 +25,6 @@ public class ClienteDAO {
                 }
             }
         } catch (SQLException e) {
-
             throw new SQLException("Erro ao salvar cliente (Pode ser violação de regra, ex: Idade): " + e.getMessage());
         }
         return generatedId;
@@ -45,7 +43,7 @@ public class ClienteDAO {
                 if (rs.getString("logradouro") != null) {
                     endereco = new Endereco(
                             rs.getString("logradouro"),
-                            rs.getString("numero"),
+                            rs.getInt("numero"),
                             rs.getString("complemento"),
                             rs.getString("municipio"),
                             rs.getString("unidade_federal"),
@@ -82,7 +80,7 @@ public class ClienteDAO {
                 if (rs.getString("logradouro") != null) {
                     endereco = new Endereco(
                             rs.getString("logradouro"),
-                            rs.getString("numero"),
+                            rs.getInt("numero"),
                             rs.getString("complemento"),
                             rs.getString("municipio"),
                             rs.getString("unidade_federal"),
@@ -105,7 +103,6 @@ public class ClienteDAO {
             throw new SQLException("Erro ao buscar cliente: " + e.getMessage());
         }
     }
-
 
     public boolean atualizar(Cliente cliente) throws SQLException {
         String sql = "UPDATE clientes SET nome = ?, idade = ?, cidade = ? WHERE id = ?";

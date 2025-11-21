@@ -90,6 +90,18 @@ public class UseCase {
         return idade;
     }
 
+    private static int lerNumero(Scanner sc) {
+        System.out.print("Número: ");
+        while (!sc.hasNextInt()) {
+            System.out.println("[ERRO] O número deve ser inteiro.");
+            sc.next();
+            System.out.print("Número: ");
+        }
+        int numero = sc.nextInt();
+        sc.nextLine();
+        return numero;
+    }
+
     private static void cadastrar(Scanner sc, ClienteController controller) throws SQLException {
         System.out.println("\n--- Dados do Cliente ---");
         System.out.print("Nome: ");
@@ -105,8 +117,9 @@ public class UseCase {
         System.out.println("\n--- Dados do Endereço ---");
         System.out.print("Logradouro: ");
         String logradouro = sc.nextLine();
-        System.out.print("Número: ");
-        String numero = sc.nextLine();
+
+        int numero = lerNumero(sc);
+
         System.out.print("Complemento (Opcional): ");
         String complemento = sc.nextLine();
         System.out.print("Município: ");
@@ -116,10 +129,7 @@ public class UseCase {
         System.out.print("País: ");
         String pais = sc.nextLine();
 
-
         ValidadorCampos.validarEndereco(logradouro, numero, complemento, municipio, uf, pais);
-        numero = ValidadorCampos.normalizarNumeroOuComplemento(numero);
-        complemento = ValidadorCampos.normalizarNumeroOuComplemento(complemento);
 
         Endereco novoEndereco = new Endereco(logradouro, numero, complemento, municipio, uf, pais);
 
@@ -232,3 +242,4 @@ public class UseCase {
         }
     }
 }
+

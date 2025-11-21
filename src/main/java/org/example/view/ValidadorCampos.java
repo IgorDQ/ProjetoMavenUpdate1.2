@@ -42,10 +42,14 @@ public class ValidadorCampos {
         }
     }
 
-    public static void validarEndereco(String logradouro, String numero, String complemento,
+    public static void validarEndereco(String logradouro, int numero, String complemento,
                                        String municipio, String uf, String pais) {
         validarLogradouro(logradouro);
-        normalizarNumeroOuComplemento(numero);
+
+        if (numero <= 0) {
+            throw new IllegalArgumentException("Número inválido. Deve ser maior que zero.");
+        }
+
         normalizarNumeroOuComplemento(complemento);
         validarMunicipio(municipio);
         validarUF(uf);

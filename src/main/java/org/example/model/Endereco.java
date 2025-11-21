@@ -2,23 +2,23 @@ package org.example.model;
 
 public class Endereco {
     private String logradouro;
-    private String numero;
+    private int numero;
     private String complemento;
     private String municipio;
     private String unidadeFederal;
     private String pais;
 
-    public Endereco(String logradouro, String numero, String complemento, String municipio, String unidadeFederal, String pais) {
+    public Endereco(String logradouro, int numero, String complemento, String municipio, String unidadeFederal, String pais) {
         validarCampos(logradouro, municipio, unidadeFederal, pais);
         this.logradouro = logradouro.trim();
-        this.numero = numero != null ? numero.trim() : "";
+        this.numero = numero;
         this.complemento = complemento != null ? complemento.trim() : "";
         this.municipio = municipio.trim();
         this.unidadeFederal = unidadeFederal.trim().toUpperCase();
         this.pais = pais.trim();
     }
 
-    public Endereco(String logradouro, String numero, String complemento, String municipio, String unidadeFederal, String pais, boolean isNull) {
+    public Endereco(String logradouro, int numero, String complemento, String municipio, String unidadeFederal, String pais, boolean isNull) {
         this.logradouro = logradouro;
         this.numero = numero;
         this.complemento = complemento;
@@ -35,7 +35,7 @@ public class Endereco {
     }
 
     public String getLogradouro() { return logradouro; }
-    public String getNumero() { return numero; }
+    public int getNumero() { return numero; }
     public String getComplemento() { return complemento; }
     public String getMunicipio() { return municipio; }
     public String getUnidadeFederal() { return unidadeFederal; }
@@ -44,6 +44,6 @@ public class Endereco {
     @Override
     public String toString() {
         String comp = complemento.isEmpty() ? "" : " | Comp: " + complemento;
-        return String.format("%s, %s%s | %s - %s (%s)", logradouro, numero, comp, municipio, unidadeFederal, pais);
+        return String.format("%s, %d%s | %s - %s (%s)", logradouro, numero, comp, municipio, unidadeFederal, pais);
     }
 }

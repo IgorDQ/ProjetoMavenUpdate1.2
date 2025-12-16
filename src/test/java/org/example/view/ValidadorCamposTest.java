@@ -1,52 +1,81 @@
-package view;
+package org.example.view;
+
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
-import org.example.view.ValidadorCampos;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ValidadorCamposTest {
 
-    // Test 1 – Nome inválido
+    // Teste 1 – Nome inválido
     @Test
     void deveLancarExcecaoParaNomeInvalido() {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
                 ValidadorCampos.validarNomeOuCidade("Jo", "Nome")
         );
+
         assertEquals("Nome inválido. Deve ter pelo menos 3 caracteres.", ex.getMessage());
     }
 
-    // Test 2 – Cidade inválida
+    // Teste 2 – Cidade inválida
     @Test
     void deveLancarExcecaoParaCidadeInvalida() {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
                 ValidadorCampos.validarNomeOuCidade("A", "Cidade")
         );
+
         assertEquals("Cidade inválido. Deve ter pelo menos 3 caracteres.", ex.getMessage());
     }
 
-    // Test 3 – Logradouro inválido
+    // Teste 3 – Logradouro inválido
     @Test
     void deveLancarExcecaoParaLogradouroInvalido() {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
-                ValidadorCampos.validarEndereco("R", "123", "", "São Paulo", "SP", "Brasil")
+                ValidadorCampos.validarEndereco(
+                        "R",        // logradouro inválido
+                        123,        // ✅ numero como int
+                        "",
+                        "São Paulo",
+                        "SP",
+                        "Brasil"
+                )
         );
+
         assertEquals("Logradouro inválido. Deve ter pelo menos 3 caracteres.", ex.getMessage());
     }
 
-    // Test 4 – UF inválida
+    // Teste 4 – UF inválida
     @Test
     void deveLancarExcecaoParaUFInvalida() {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
-                ValidadorCampos.validarEndereco("Rua A", "123", "", "São Paulo", "Sao", "Brasil")
+                ValidadorCampos.validarEndereco(
+                        "Rua A",
+                        123,
+                        "",
+                        "São Paulo",
+                        "Sao",      // UF inválida
+                        "Brasil"
+                )
         );
+
         assertEquals("UF inválida. Use 2 letras maiúsculas.", ex.getMessage());
     }
 
-    // Teste adicional – Pais inválido
+    // Teste 5 – País inválido
     @Test
     void deveLancarExcecaoParaPaisInvalido() {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
-                ValidadorCampos.validarEndereco("Rua A", "123", "", "São Paulo", "SP", "Br")
+                ValidadorCampos.validarEndereco(
+                        "Rua A",
+                        123,
+                        "",
+                        "São Paulo",
+                        "SP",
+                        "Br"        // país inválido
+                )
         );
+
         assertEquals("País inválido. Deve ter pelo menos 3 caracteres.", ex.getMessage());
     }
 }
+

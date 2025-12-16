@@ -1,9 +1,8 @@
-package view;
+package org.example.view;
 
 import org.example.controller.ClienteController;
 import org.example.model.Cliente;
 import org.example.model.Endereco;
-import org.example.view.UseCase;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,7 +57,7 @@ class UseCaseTest {
 
         Endereco end = enderecoCaptor.getValue();
         assertEquals("Rua A", end.getLogradouro());
-        assertEquals("123", end.getNumero());
+        assertEquals(123, end.getNumero()); // ✅ CORRETO
         assertEquals("Apto 12", end.getComplemento());
         assertEquals("São Paulo", end.getMunicipio());
         assertEquals("SP", end.getUnidadeFederal());
@@ -104,15 +103,16 @@ class UseCaseTest {
 
         assertDoesNotThrow(() -> ClienteViewTestHelper.cadastrar(sc, controllerMock));
 
-        verify(controllerMock, times(1)).cadastrar(eq("João"), eq(25), eq("São Paulo"), any(Endereco.class));
+        verify(controllerMock, times(1))
+                .cadastrar(eq("João"), eq(25), eq("São Paulo"), any(Endereco.class));
     }
 
-    // acessar métodos privados da view
     static class ClienteViewTestHelper {
 
         static void cadastrar(Scanner sc, ClienteController controller) throws SQLException {
             try {
-                java.lang.reflect.Method m = UseCase.class.getDeclaredMethod("cadastrar", Scanner.class, ClienteController.class);
+                java.lang.reflect.Method m =
+                        UseCase.class.getDeclaredMethod("cadastrar", Scanner.class, ClienteController.class);
                 m.setAccessible(true);
                 m.invoke(null, sc, controller);
             } catch (Exception e) {
@@ -122,7 +122,8 @@ class UseCaseTest {
 
         static void listar(ClienteController controller) throws SQLException {
             try {
-                java.lang.reflect.Method m = UseCase.class.getDeclaredMethod("listar", ClienteController.class);
+                java.lang.reflect.Method m =
+                        UseCase.class.getDeclaredMethod("listar", ClienteController.class);
                 m.setAccessible(true);
                 m.invoke(null, controller);
             } catch (Exception e) {
@@ -132,7 +133,8 @@ class UseCaseTest {
 
         static void buscar(Scanner sc, ClienteController controller) throws SQLException {
             try {
-                java.lang.reflect.Method m = UseCase.class.getDeclaredMethod("buscar", Scanner.class, ClienteController.class);
+                java.lang.reflect.Method m =
+                        UseCase.class.getDeclaredMethod("buscar", Scanner.class, ClienteController.class);
                 m.setAccessible(true);
                 m.invoke(null, sc, controller);
             } catch (Exception e) {

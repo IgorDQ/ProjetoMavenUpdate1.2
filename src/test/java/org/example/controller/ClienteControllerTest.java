@@ -1,6 +1,5 @@
-package controller;
+package org.example.controller;
 
-import org.example.controller.ClienteController;
 import org.example.model.Cliente;
 import org.example.model.ClienteDAO;
 import org.example.model.Endereco;
@@ -40,7 +39,7 @@ class ClienteControllerTest {
     @BeforeEach
     void setup() {
         enderecoExemplo = new Endereco(
-                "Rua A", "123", "Bloco 2",
+                "Rua A",  123, "Bloco 2",
                 "São Paulo", "SP", "Brasil"
         );
 

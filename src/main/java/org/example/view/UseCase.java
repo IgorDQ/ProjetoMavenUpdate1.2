@@ -14,49 +14,7 @@ public class UseCase {
     private static final ClienteController controller = new ClienteController();
     private static final Scanner sc = new Scanner(System.in);
 
-    public static void main(String[] args) {
-        System.out.println("--- Sistema de Cadastro de Clientes ---");
-
-        try {
-            while (true) {
-                exibirMenu();
-                int opcao = lerOpcao(sc);
-
-                try {
-                    switch (opcao) {
-                        case 1:
-                            cadastrar(sc, controller);
-                            break;
-                        case 2:
-                            listar(controller);
-                            break;
-                        case 3:
-                            buscar(sc, controller);
-                            break;
-                        case 4:
-                            atualizar(sc, controller);
-                            break;
-                        case 5:
-                            deletar(sc, controller);
-                            break;
-                        case 6:
-                            System.out.println("Encerrando o sistema. Tchau!");
-                            return;
-                        default:
-                            System.out.println("[ERRO] Opção inválida. Tente novamente.");
-                    }
-                } catch (SQLException e) {
-                    System.out.println("\n[ERRO DE BANCO DE DADOS] Ocorreu um erro: " + e.getMessage());
-                } catch (IllegalArgumentException e) {
-                    System.out.println("\n[ERRO DE VALIDAÇÃO] " + e.getMessage());
-                }
-            }
-        } finally {
-            sc.close();
-        }
-    }
-
-    private static void exibirMenu() {
+    public static void exibirMenu() {
         System.out.println("\n--- MENU ---");
         System.out.println("1. Cadastrar Cliente");
         System.out.println("2. Listar Clientes");
@@ -67,7 +25,7 @@ public class UseCase {
         System.out.print("Escolha uma opção: ");
     }
 
-    private static int lerOpcao(Scanner sc) {
+    public static int lerOpcao(Scanner sc) {
         try {
             return sc.nextInt();
         } catch (InputMismatchException e) {
@@ -102,7 +60,7 @@ public class UseCase {
         return numero;
     }
 
-    private static void cadastrar(Scanner sc, ClienteController controller) throws SQLException {
+    public static void cadastrar(Scanner sc, ClienteController controller) throws SQLException {
         System.out.println("\n--- Dados do Cliente ---");
         System.out.print("Nome: ");
         String nome = sc.nextLine();
@@ -137,7 +95,7 @@ public class UseCase {
         System.out.println("\n[SUCESSO] Cliente e Endereço cadastrados!");
     }
 
-    private static void listar(ClienteController controller) throws SQLException {
+    public static void listar(ClienteController controller) throws SQLException {
         List<Cliente> clientes = controller.listar();
         if (clientes.isEmpty()) {
             System.out.println("\nNenhum cliente cadastrado.");
@@ -150,7 +108,7 @@ public class UseCase {
         }
     }
 
-    private static void buscar(Scanner sc, ClienteController controller) throws SQLException {
+    public static void buscar(Scanner sc, ClienteController controller) throws SQLException {
         System.out.println("\n--- Buscar Cliente ---");
         System.out.print("ID do Cliente: ");
         if (!sc.hasNextInt()) {
@@ -170,7 +128,7 @@ public class UseCase {
         }
     }
 
-    private static void atualizar(Scanner sc, ClienteController controller) throws SQLException {
+    public static void atualizar(Scanner sc, ClienteController controller) throws SQLException {
         System.out.println("\n--- Atualizar Cliente ---");
         System.out.print("ID do Cliente a ser atualizado: ");
         if (!sc.hasNextInt()) {
@@ -215,7 +173,13 @@ public class UseCase {
         if (cidade.trim().isEmpty()) cidade = clienteExistente.getCidade();
         else ValidadorCampos.validarNomeOuCidade(cidade, "Cidade");
 
-        Cliente clienteAtualizado = new Cliente(id, nome, idade, cidade, clienteExistente.getEndereco());
+        Cliente clienteAtualizado = new Cliente(
+                id,
+                nome,
+                idade,
+                cidade,
+                clienteExistente.getEndereco()
+        );
 
         if (controller.atualizar(clienteAtualizado)) {
             System.out.println("\n[SUCESSO] Cliente ID " + id + " atualizado.");
@@ -224,7 +188,7 @@ public class UseCase {
         }
     }
 
-    private static void deletar(Scanner sc, ClienteController controller) throws SQLException {
+    public static void deletar(Scanner sc, ClienteController controller) throws SQLException {
         System.out.println("\n--- Deletar Cliente ---");
         System.out.print("ID do Cliente a ser deletado: ");
         if (!sc.hasNextInt()) {
@@ -236,10 +200,11 @@ public class UseCase {
         sc.nextLine();
 
         if (controller.deletar(id)) {
-            System.out.println("\n[SUCESSO] Cliente ID " + id + " deletado (e seu endereço, via ON DELETE CASCADE).");
+            System.out.println("\n[SUCESSO] Cliente ID " + id +
+                    " deletado (e seu endereço, via ON DELETE CASCADE).");
         } else {
-            System.out.println("\n[FALHA] Cliente ID " + id + " não encontrado ou erro ao deletar.");
+            System.out.println("\n[FALHA] Cliente ID " + id +
+                    " não encontrado ou erro ao deletar.");
         }
     }
 }
-

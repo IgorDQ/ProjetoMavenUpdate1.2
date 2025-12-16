@@ -1,17 +1,16 @@
-package model;
+package org.example.model;
 
-import org.example.model.Cliente;
-import org.example.model.Endereco;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ClienteTest {
 
     private Endereco criaEnderecoExemplo() {
         return new Endereco(
                 "Rua A",      // logradouro
-                "123",        // numero
+                123,        // numero
                 "Apto 12",    // complemento
                 "São Paulo",  // município
                 "SP",         // unidade federativa (UF)2 letras maiúsculas

@@ -11,7 +11,7 @@ public class Main {
         System.out.println("Conectando ao sistema...");
 
         try {
-            UseCase.main(args);
+           // UseCase.main(args);
         } catch (Exception e) {
             System.out.println("Erro fatal: " + e.getMessage());
         }

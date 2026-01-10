@@ -1,6 +1,9 @@
 package org.example;
+import org.example.model.ClienteDAO;
+import org.example.dto.PessoaEnderecoDTO;
 
-import org.example.view.UseCase;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
 
@@ -12,6 +15,11 @@ public class Main {
 
         try {
            // UseCase.main(args);
+            List<PessoaEnderecoDTO> pessoas = new ArrayList<>();
+            ClienteDAO C = new ClienteDAO();
+            pessoas = C.listarPorLogradouro("rua sao tome");
+
+
         } catch (Exception e) {
             System.out.println("Erro fatal: " + e.getMessage());
         }
@@ -22,4 +30,4 @@ public class Main {
 }
 
 
-// testando commit
+

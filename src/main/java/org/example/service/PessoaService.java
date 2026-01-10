@@ -17,6 +17,18 @@ public class PessoaService {
     }
 
     public List<PessoaEnderecoDTO> listarPorLogradouro(String logradouro) throws SQLException {
+
+        if (logradouro == null || logradouro.isBlank()) {
+            throw new IllegalArgumentException("Logradouro não informado");
+        }
+
+        if (logradouro.length() < 5) {
+            throw new IllegalArgumentException(
+                    "numero minimo de caracteres(5)"
+            );
+        }
+
+
         return clienteDAO.listarPorLogradouro(logradouro);
     }
 }

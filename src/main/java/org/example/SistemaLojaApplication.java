@@ -12,5 +12,3 @@ public class SistemaLojaApplication {
 }
 
 
-// task 1:
-// task 2: http://localhost:8080/pessoas/listar?logradouro=Rua

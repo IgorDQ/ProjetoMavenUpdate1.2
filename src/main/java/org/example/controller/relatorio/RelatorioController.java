@@ -44,7 +44,7 @@ public class RelatorioController {
                 .body(csv);
     }
 
-    @GetMapping("/unificado/csv") // <-- ADICIONADO (TASK 4)
+    @GetMapping("/unificado/csv")
     public ResponseEntity<byte[]> relatorioUnificado() throws SQLException {
 
         byte[] csv = relatorioService.gerarRelatorioUnificadoCsv();

@@ -1,7 +1,9 @@
 package org.example.controller;
 
 import java.sql.SQLException;
+
 import org.example.service.PessoaService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,15 +20,28 @@ public class PessoaController {
         this.service = service;
     }
 
-
     @GetMapping("/listar")
-    public ResponseEntity<?> listar(@RequestParam String logradouro)
-            throws SQLException {
+    public ResponseEntity<?> listar(
+            @RequestParam String logradouro,
+            @RequestParam(required = false) String origem
+    ) throws SQLException {
 
-        return ResponseEntity.ok(
-                service.listarPorLogradouro(logradouro)
-        );
+        try {
+            return ResponseEntity.ok(
+                    service.listarPorLogradouro(logradouro)
+            );
+        } catch (IllegalArgumentException e) {
+
+
+            if ("html".equalsIgnoreCase(origem)) {
+                return ResponseEntity
+                        .badRequest()
+                        .contentType(MediaType.TEXT_PLAIN)
+                        .body(e.getMessage());
+            }
+
+
+            throw e;
+        }
     }
-
-
 }

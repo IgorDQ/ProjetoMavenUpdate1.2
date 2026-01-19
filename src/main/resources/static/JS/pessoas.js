@@ -4,11 +4,9 @@ $(document).ready(function () {
 
         const logradouro = $('#logradouro').val().trim();
 
-
         $('#mensagem').hide().text('');
         $('#tabelaResultados').addClass('d-none');
         $('#corpoTabela').empty();
-
 
         if (logradouro.length < 5) {
             $('#mensagem')
@@ -23,8 +21,8 @@ $(document).ready(function () {
             url: '/pessoas/listar',
             method: 'GET',
             data: { logradouro: logradouro },
-            success: function (dados) {
 
+            success: function (dados) {
 
                 if (!dados || dados.length === 0) {
                     $('#mensagem')
@@ -34,7 +32,6 @@ $(document).ready(function () {
                         .show();
                     return;
                 }
-
 
                 let tbody = $('#corpoTabela');
 
@@ -49,14 +46,19 @@ $(document).ready(function () {
                     `);
                 });
 
-
                 $('#tabelaResultados').removeClass('d-none');
             },
+
             error: function (xhr) {
 
                 let msg = 'Erro no sistema.';
 
-                if (xhr.status === 400) {
+
+                if (xhr.responseJSON && xhr.responseJSON.erro) {
+                    msg = xhr.responseJSON.erro;
+                }
+
+                else if (xhr.responseText) {
                     msg = xhr.responseText;
                 }
 

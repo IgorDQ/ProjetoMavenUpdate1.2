@@ -1,74 +1,71 @@
 $(document).ready(function () {
 
-    $('#btnPesquisar').click(function () {
+    $('#btnPesquisar').on('click', function () {
 
-        const logradouro = $('#logradouro').val();
+        const logradouro = $('#logradouro').val().trim();
 
-        // Limpa mensagens e tabela
-        $('#mensagem').hide();
-        $('#tabelaPessoas').hide();
-        $('#tabelaPessoas tbody').empty();
 
-        // REGRA DE NEGÓCIO NO FRONT (UX)
+        $('#mensagem').hide().text('');
+        $('#tabelaResultados').addClass('d-none');
+        $('#corpoTabela').empty();
+
+
         if (logradouro.length < 5) {
             $('#mensagem')
                 .removeClass()
                 .addClass('alert alert-warning')
-                .text('numero minimo de caracteres(5)')
+                .text('Digite pelo menos 5 caracteres')
                 .show();
             return;
         }
 
         $.ajax({
-            url: 'http://localhost:8080/pessoas/listar',
+            url: '/pessoas/listar',
             method: 'GET',
-            data: {
-                logradouro: logradouro
-            },
-            success: function (data) {
+            data: { logradouro: logradouro },
+            success: function (dados) {
 
-                if (data.length === 0) {
+
+                if (!dados || dados.length === 0) {
                     $('#mensagem')
                         .removeClass()
                         .addClass('alert alert-info')
-                        .text('Informação não encontrada')
+                        .text('Nenhuma pessoa encontrada')
                         .show();
                     return;
                 }
 
-                let tbody = $('#tabelaPessoas tbody');
 
-                data.forEach(function (pessoa) {
-                    tbody.append(
-                        `<tr>
+                let tbody = $('#corpoTabela');
+
+                dados.forEach(function (pessoa) {
+                    tbody.append(`
+                        <tr>
                             <td>${pessoa.nome}</td>
                             <td>${pessoa.idade}</td>
                             <td>${pessoa.cidade}</td>
                             <td>${pessoa.estado}</td>
-                        </tr>`
-                    );
+                        </tr>
+                    `);
                 });
 
-                $('#tabelaPessoas').show();
+
+                $('#tabelaResultados').removeClass('d-none');
             },
             error: function (xhr) {
 
+                let msg = 'Erro no sistema.';
+
                 if (xhr.status === 400) {
-                    $('#mensagem')
-                        .removeClass()
-                        .addClass('alert alert-warning')
-                        .text(xhr.responseText)
-                        .show();
-                } else {
-                    $('#mensagem')
-                        .removeClass()
-                        .addClass('alert alert-danger')
-                        .text('Erro no sistema')
-                        .show();
+                    msg = xhr.responseText;
                 }
+
+                $('#mensagem')
+                    .removeClass()
+                    .addClass('alert alert-danger')
+                    .text(msg)
+                    .show();
             }
         });
-
     });
-
 });

@@ -2,7 +2,6 @@ package org.example.controller;
 
 import org.example.model.Cliente;
 import org.example.model.ClienteDAO;
-import org.example.model.Endereco;
 import org.example.model.EnderecoDAO;
 
 import java.sql.SQLException;
@@ -10,44 +9,42 @@ import java.util.List;
 
 public class ClienteController {
 
-    private final ClienteDAO clienteDao;
-    private final EnderecoDAO enderecoDao;
+    private final ClienteDAO clienteDAO;
+    private final EnderecoDAO enderecoDAO;
 
-    public ClienteController() {
-        this(new ClienteDAO(), new EnderecoDAO());
+    public ClienteController(ClienteDAO clienteDAO, EnderecoDAO enderecoDAO) {
+        this.clienteDAO = clienteDAO;
+        this.enderecoDAO = enderecoDAO;
     }
 
-    // permite injeção de mocks
-    public ClienteController(ClienteDAO clienteDao, EnderecoDAO enderecoDao) {
-        this.clienteDao = clienteDao;
-        this.enderecoDao = enderecoDao;
+
+    // CADASTRAR
+    public void cadastrar(Cliente cliente) throws SQLException {
+        clienteDAO.salvar(cliente);
+        enderecoDAO.salvar(cliente.getId(), cliente.getEndereco());
     }
 
-    public void cadastrar(String nome, int idade, String cidade, Endereco endereco) throws SQLException {
-        Cliente cliente = new Cliente(nome, idade, cidade);
 
-        int clienteId = clienteDao.salvar(cliente);
-
-        if (clienteId == -1) {
-            throw new SQLException("Falha ao obter ID do cliente após o cadastro.");
-        }
-
-        enderecoDao.salvarComProcedure(clienteId, endereco);
-    }
-
+    // LISTAR
     public List<Cliente> listar() throws SQLException {
-        return clienteDao.listar();
+        return clienteDAO.listar();
     }
 
+
+    // BUSCAR POR ID
     public Cliente buscarPorId(int id) throws SQLException {
-        return clienteDao.buscarPorId(id);
+        return clienteDAO.buscarPorId(id);
     }
 
+
+    // ATUALIZAR
     public boolean atualizar(Cliente cliente) throws SQLException {
-        return clienteDao.atualizar(cliente);
+        return clienteDAO.atualizar(cliente);
     }
 
+
+    // DELETAR
     public boolean deletar(int id) throws SQLException {
-        return clienteDao.deletar(id);
+        return clienteDAO.deletar(id);
     }
 }

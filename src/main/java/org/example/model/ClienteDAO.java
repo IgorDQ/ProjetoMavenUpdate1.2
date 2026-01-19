@@ -2,13 +2,11 @@ package org.example.model;
 
 import org.example.DatabaseConnection;
 import org.example.dto.PessoaEnderecoDTO;
+import org.example.dto.RelatorioCidadeDTO;
+import org.example.dto.RelatorioEstadoDTO;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +17,7 @@ public class ClienteDAO {
     public int salvar(Cliente cliente) throws SQLException {
 
         String sql = "INSERT INTO clientes (nome, idade, cidade) VALUES (?, ?, ?)";
-        int generatedId = -1;
+        int idGerado = -1;
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -30,21 +28,14 @@ public class ClienteDAO {
 
             stmt.executeUpdate();
 
-            try (ResultSet rs = stmt.getGeneratedKeys()) {
-                if (rs.next()) {
-                    generatedId = rs.getInt(1);
-                }
+            ResultSet rs = stmt.getGeneratedKeys();
+            if (rs.next()) {
+                idGerado = rs.getInt(1);
             }
-
-        } catch (SQLException e) {
-            throw new SQLException(
-                    "Erro ao salvar cliente (Pode ser violação de regra, ex: Idade): " + e.getMessage()
-            );
         }
 
-        return generatedId;
+        return idGerado;
     }
-
 
     public List<Cliente> listar() throws SQLException {
 
@@ -57,19 +48,15 @@ public class ClienteDAO {
 
             while (rs.next()) {
 
-                Endereco endereco = null;
-
-                if (rs.getString("logradouro") != null) {
-                    endereco = new Endereco(
-                            rs.getString("logradouro"),
-                            rs.getInt("numero"),
-                            rs.getString("complemento"),
-                            rs.getString("municipio"),
-                            rs.getString("unidade_federal"),
-                            rs.getString("pais"),
-                            true
-                    );
-                }
+                Endereco endereco = new Endereco(
+                        rs.getString("logradouro"),
+                        rs.getInt("numero"),
+                        rs.getString("complemento"),
+                        rs.getString("municipio"),
+                        rs.getString("unidade_federal"),
+                        rs.getString("pais"),
+                        true
+                );
 
                 Cliente cliente = new Cliente(
                         rs.getInt("cliente_id"),
@@ -81,14 +68,10 @@ public class ClienteDAO {
 
                 clientes.add(cliente);
             }
-
-        } catch (SQLException e) {
-            throw new SQLException("Erro ao listar clientes: " + e.getMessage());
         }
 
         return clientes;
     }
-
 
     public Cliente buscarPorId(int id) throws SQLException {
 
@@ -98,24 +81,19 @@ public class ClienteDAO {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
-
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
 
-                Endereco endereco = null;
-
-                if (rs.getString("logradouro") != null) {
-                    endereco = new Endereco(
-                            rs.getString("logradouro"),
-                            rs.getInt("numero"),
-                            rs.getString("complemento"),
-                            rs.getString("municipio"),
-                            rs.getString("unidade_federal"),
-                            rs.getString("pais"),
-                            true
-                    );
-                }
+                Endereco endereco = new Endereco(
+                        rs.getString("logradouro"),
+                        rs.getInt("numero"),
+                        rs.getString("complemento"),
+                        rs.getString("municipio"),
+                        rs.getString("unidade_federal"),
+                        rs.getString("pais"),
+                        true
+                );
 
                 return new Cliente(
                         rs.getInt("cliente_id"),
@@ -125,14 +103,10 @@ public class ClienteDAO {
                         endereco
                 );
             }
-
-            return null;
-
-        } catch (SQLException e) {
-            throw new SQLException("Erro ao buscar cliente: " + e.getMessage());
         }
-    }
 
+        return null;
+    }
 
     public boolean atualizar(Cliente cliente) throws SQLException {
 
@@ -147,12 +121,8 @@ public class ClienteDAO {
             stmt.setInt(4, cliente.getId());
 
             return stmt.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            throw new SQLException("Erro ao atualizar cliente: " + e.getMessage());
         }
     }
-
 
     public boolean deletar(int id) throws SQLException {
 
@@ -162,23 +132,14 @@ public class ClienteDAO {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
-
             return stmt.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            throw new SQLException("Erro ao deletar cliente: " + e.getMessage());
         }
     }
-
 
     public List<PessoaEnderecoDTO> listarPorLogradouro(String logradouro) throws SQLException {
 
         String sql = """
-            SELECT
-                nome,
-                idade,
-                cidade,
-                unidade_federal AS estado
+            SELECT nome, idade, cidade, unidade_federal AS estado
             FROM cliente_completo_view
             WHERE pais = 'Brasil'
               AND logradouro LIKE ?
@@ -190,23 +151,83 @@ public class ClienteDAO {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, "%" + logradouro + "%");
-
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                PessoaEnderecoDTO dto = new PessoaEnderecoDTO(
+                pessoas.add(new PessoaEnderecoDTO(
                         rs.getString("nome"),
                         rs.getInt("idade"),
                         rs.getString("cidade"),
                         rs.getString("estado")
-                );
-                pessoas.add(dto);
+                ));
             }
-
-        } catch (SQLException e) {
-            throw new SQLException("Erro ao listar pessoas por logradouro: " + e.getMessage());
         }
 
         return pessoas;
+    }
+
+    public List<RelatorioCidadeDTO> buscarRelatorioPorCidade() throws SQLException {
+
+        String sql = """
+            SELECT
+                cidade,
+                unidade_federal AS estado,
+                COUNT(*) AS quantidade_pessoas,
+                AVG(idade) AS idade_media
+            FROM cliente_completo_view
+            WHERE pais = 'Brasil'
+            GROUP BY cidade, unidade_federal
+            ORDER BY cidade
+        """;
+
+        List<RelatorioCidadeDTO> resultado = new ArrayList<>();
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                resultado.add(new RelatorioCidadeDTO(
+                        rs.getString("cidade"),
+                        rs.getString("estado"),
+                        rs.getInt("quantidade_pessoas"),
+                        rs.getDouble("idade_media")
+                ));
+            }
+        }
+
+        return resultado;
+    }
+
+
+    public List<RelatorioEstadoDTO> buscarRelatorioPorEstado() throws SQLException {
+
+        String sql = """
+            SELECT
+                unidade_federal AS estado,
+                COUNT(*) AS quantidade_pessoas,
+                AVG(idade) AS idade_media
+            FROM cliente_completo_view
+            WHERE pais = 'Brasil'
+            GROUP BY unidade_federal
+            ORDER BY unidade_federal
+        """;
+
+        List<RelatorioEstadoDTO> resultado = new ArrayList<>();
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                resultado.add(new RelatorioEstadoDTO(
+                        rs.getString("estado"),
+                        rs.getInt("quantidade_pessoas"),
+                        rs.getDouble("idade_media")
+                ));
+            }
+        }
+
+        return resultado;
     }
 }

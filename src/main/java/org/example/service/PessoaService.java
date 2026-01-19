@@ -24,11 +24,20 @@ public class PessoaService {
 
         if (logradouro.length() < 5) {
             throw new IllegalArgumentException(
-                    "numero minimo de caracteres(5)"
+                    "Digite pelo menos 5 caracteres"
             );
         }
 
 
-        return clienteDAO.listarPorLogradouro(logradouro);
+        List<PessoaEnderecoDTO> pessoas =
+                clienteDAO.listarPorLogradouro(logradouro);
+
+
+        if (pessoas.isEmpty()) {
+            throw new IllegalArgumentException("Nenhuma pessoa encontrada");
+        }
+
+
+        return pessoas;
     }
 }

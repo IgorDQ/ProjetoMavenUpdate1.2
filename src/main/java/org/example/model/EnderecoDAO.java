@@ -1,48 +1,32 @@
 package org.example.model;
 
-import org.example.DatabaseConnection;
-import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class EnderecoDAO {
 
-    public int salvarEndereco(Endereco endereco) throws SQLException {
-        String sql = "{CALL inserir_endereco(?, ?, ?, ?, ?, ?, ?)}";
+    public void salvar(int clienteId, Endereco endereco) throws SQLException {
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             CallableStatement cs = conn.prepareCall(sql)) {
+        String sql = """
+            INSERT INTO endereco
+            (logradouro, numero, complemento, municipio, uf, pais, ativo, cliente_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """;
 
-            cs.setString(1, endereco.getLogradouro());
-            cs.setInt(2, endereco.getNumero());
-            cs.setString(3, endereco.getComplemento());
-            cs.setString(4, endereco.getMunicipio());
-            cs.setString(5, endereco.getUnidadeFederal());
-            cs.setString(6, endereco.getPais());
+        try (Connection conn = DatabaseConnectionModel.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            cs.registerOutParameter(7, java.sql.Types.INTEGER);
+            stmt.setString(1, endereco.getLogradouro());
+            stmt.setInt(2, endereco.getNumero());
+            stmt.setString(3, endereco.getComplemento());
+            stmt.setString(4, endereco.getMunicipio());
+            stmt.setString(5, endereco.getUf());
+            stmt.setString(6, endereco.getPais());
+            stmt.setBoolean(7, endereco.isAtivo());
+            stmt.setInt(8, clienteId);
 
-            cs.execute();
-            return cs.getInt(7);
-        }
-    }
-
-    public void salvarComProcedure(int clienteId, Endereco endereco) throws SQLException {
-
-        String sql = "{CALL sp_inserir_endereco(?, ?, ?, ?, ?, ?, ?)}";
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             CallableStatement cs = conn.prepareCall(sql)) {
-
-            cs.setInt(1, clienteId);
-            cs.setString(2, endereco.getLogradouro());
-            cs.setInt(3, endereco.getNumero());
-            cs.setString(4, endereco.getComplemento());
-            cs.setString(5, endereco.getMunicipio());
-            cs.setString(6, endereco.getUnidadeFederal());
-            cs.setString(7, endereco.getPais());
-
-            cs.execute();
+            stmt.executeUpdate();
         }
     }
 }

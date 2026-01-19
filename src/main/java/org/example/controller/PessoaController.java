@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import java.sql.SQLException;
 import org.example.service.PessoaService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,17 +18,15 @@ public class PessoaController {
         this.service = service;
     }
 
+
     @GetMapping("/listar")
-    public ResponseEntity<?> listar(@RequestParam String logradouro) {
-        try {
-            return ResponseEntity.ok(service.listarPorLogradouro(logradouro));
-        /*} catch (IllegalArgumentException e) {
-            // erro de regra de negócio (min 5 caracteres)
-            return ResponseEntity.badRequest().body(e.getMessage());*/
-        } catch (Exception e) {
-            // erro inesperado (banco, sistema, etc.)
-            return ResponseEntity.internalServerError()
-                    .body("Erro no sistema");
-        }
+    public ResponseEntity<?> listar(@RequestParam String logradouro)
+            throws SQLException {
+
+        return ResponseEntity.ok(
+                service.listarPorLogradouro(logradouro)
+        );
     }
+
+
 }

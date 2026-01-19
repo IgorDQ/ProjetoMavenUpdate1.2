@@ -2,8 +2,9 @@ package org.example.view;
 
 import org.example.controller.ClienteController;
 import org.example.model.Cliente;
+import org.example.model.ClienteDAO;
 import org.example.model.Endereco;
-
+import org.example.model.EnderecoDAO;
 import java.sql.SQLException;
 import java.util.InputMismatchException;
 import java.util.List;
@@ -11,200 +12,94 @@ import java.util.Scanner;
 
 public class UseCase {
 
-    private static final ClienteController controller = new ClienteController();
+    private static final ClienteController controller =
+            new ClienteController(new ClienteDAO(), new EnderecoDAO());
+
     private static final Scanner sc = new Scanner(System.in);
 
-    public static void exibirMenu() {
-        System.out.println("\n--- MENU ---");
-        System.out.println("1. Cadastrar Cliente");
-        System.out.println("2. Listar Clientes");
-        System.out.println("3. Buscar Cliente por ID");
-        System.out.println("4. Atualizar Cliente");
-        System.out.println("5. Deletar Cliente");
-        System.out.println("6. Sair");
-        System.out.print("Escolha uma opção: ");
-    }
-
-    public static int lerOpcao(Scanner sc) {
-        try {
-            return sc.nextInt();
-        } catch (InputMismatchException e) {
-            sc.nextLine();
-            return -1;
-        } finally {
-            sc.nextLine();
-        }
-    }
-
-    private static int lerIdade(Scanner sc) {
-        System.out.print("Idade: ");
-        while (!sc.hasNextInt()) {
-            System.out.println("[ERRO] Por favor, digite um número inteiro para a idade.");
-            sc.next();
-            System.out.print("Idade: ");
-        }
-        int idade = sc.nextInt();
-        sc.nextLine();
-        return idade;
-    }
-
-    private static int lerNumero(Scanner sc) {
-        System.out.print("Número: ");
-        while (!sc.hasNextInt()) {
-            System.out.println("[ERRO] O número deve ser inteiro.");
-            sc.next();
-            System.out.print("Número: ");
-        }
-        int numero = sc.nextInt();
-        sc.nextLine();
-        return numero;
-    }
-
-    public static void cadastrar(Scanner sc, ClienteController controller) throws SQLException {
-        System.out.println("\n--- Dados do Cliente ---");
+    public static void cadastrar() throws SQLException {
         System.out.print("Nome: ");
         String nome = sc.nextLine();
-        int idade = lerIdade(sc);
+
+        System.out.print("Idade: ");
+        int idade = sc.nextInt();
+        sc.nextLine();
+
         System.out.print("Cidade: ");
         String cidade = sc.nextLine();
 
-        ValidadorCampos.validarNomeOuCidade(nome, "Nome");
-        ValidadorCampos.validarIdade(idade);
-        ValidadorCampos.validarNomeOuCidade(cidade, "Cidade");
-
-        System.out.println("\n--- Dados do Endereço ---");
         System.out.print("Logradouro: ");
         String logradouro = sc.nextLine();
 
-        int numero = lerNumero(sc);
+        System.out.print("Número: ");
+        int numero = sc.nextInt();
+        sc.nextLine();
 
-        System.out.print("Complemento (Opcional): ");
+        System.out.print("Complemento: ");
         String complemento = sc.nextLine();
+
         System.out.print("Município: ");
         String municipio = sc.nextLine();
-        System.out.print("Unidade Federal (Ex: SP): ");
+
+        System.out.print("UF: ");
         String uf = sc.nextLine();
+
         System.out.print("País: ");
         String pais = sc.nextLine();
 
-        ValidadorCampos.validarEndereco(logradouro, numero, complemento, municipio, uf, pais);
+        Endereco endereco = new Endereco(
+                logradouro,
+                numero,
+                complemento,
+                municipio,
+                uf,
+                pais,
+                true
+        );
 
-        Endereco novoEndereco = new Endereco(logradouro, numero, complemento, municipio, uf, pais);
+        Cliente cliente = new Cliente(nome, idade, cidade);
+        cliente.setEndereco(endereco);
 
-        controller.cadastrar(nome, idade, cidade, novoEndereco);
-        System.out.println("\n[SUCESSO] Cliente e Endereço cadastrados!");
+        controller.cadastrar(cliente);
+
+        System.out.println("Cliente cadastrado com sucesso!");
     }
 
-    public static void listar(ClienteController controller) throws SQLException {
+    public static void listar() throws SQLException {
         List<Cliente> clientes = controller.listar();
-        if (clientes.isEmpty()) {
-            System.out.println("\nNenhum cliente cadastrado.");
-            return;
-        }
-
-        System.out.println("\n--- Lista de Clientes ---");
-        for (Cliente cliente : clientes) {
-            System.out.println(cliente);
-        }
+        clientes.forEach(System.out::println);
     }
 
-    public static void buscar(Scanner sc, ClienteController controller) throws SQLException {
-        System.out.println("\n--- Buscar Cliente ---");
-        System.out.print("ID do Cliente: ");
-        if (!sc.hasNextInt()) {
-            System.out.println("[ERRO] ID deve ser um número.");
-            sc.nextLine();
-            return;
-        }
+    public static void atualizar() throws SQLException {
+        System.out.print("ID do cliente: ");
         int id = sc.nextInt();
         sc.nextLine();
 
-        Cliente cliente = controller.buscarPorId(id);
-        if (cliente != null) {
-            System.out.println("\n--- Resultado da Busca ---");
-            System.out.println(cliente);
-        } else {
-            System.out.println("\nCliente com ID " + id + " não encontrado.");
-        }
-    }
-
-    public static void atualizar(Scanner sc, ClienteController controller) throws SQLException {
-        System.out.println("\n--- Atualizar Cliente ---");
-        System.out.print("ID do Cliente a ser atualizado: ");
-        if (!sc.hasNextInt()) {
-            System.out.println("[ERRO] ID deve ser um número.");
-            sc.nextLine();
-            return;
-        }
-        int id = sc.nextInt();
-        sc.nextLine();
-
-        Cliente clienteExistente = controller.buscarPorId(id);
-        if (clienteExistente == null) {
-            System.out.println("\nCliente com ID " + id + " não encontrado.");
+        Cliente existente = controller.buscarPorId(id);
+        if (existente == null) {
+            System.out.println("Cliente não encontrado.");
             return;
         }
 
-        System.out.println("Cliente atual: " + clienteExistente);
-
-        System.out.println("\nNovos Dados:");
-        System.out.print("Novo Nome (" + clienteExistente.getNome() + "): ");
+        System.out.print("Novo nome: ");
         String nome = sc.nextLine();
-        if (nome.trim().isEmpty()) nome = clienteExistente.getNome();
-        else ValidadorCampos.validarNomeOuCidade(nome, "Nome");
 
-        System.out.print("Nova Idade (" + clienteExistente.getIdade() + "): ");
-        String idadeStr = sc.nextLine();
-        int idade;
-        if (idadeStr.trim().isEmpty()) {
-            idade = clienteExistente.getIdade();
-        } else {
-            try {
-                idade = Integer.parseInt(idadeStr);
-                ValidadorCampos.validarIdade(idade);
-            } catch (NumberFormatException e) {
-                System.out.println("[ERRO] Idade inválida. Operação cancelada.");
-                return;
-            }
-        }
+        System.out.print("Nova idade: ");
+        int idade = sc.nextInt();
+        sc.nextLine();
 
-        System.out.print("Nova Cidade (" + clienteExistente.getCidade() + "): ");
+        System.out.print("Nova cidade: ");
         String cidade = sc.nextLine();
-        if (cidade.trim().isEmpty()) cidade = clienteExistente.getCidade();
-        else ValidadorCampos.validarNomeOuCidade(cidade, "Cidade");
 
-        Cliente clienteAtualizado = new Cliente(
+        Cliente atualizado = new Cliente(
                 id,
                 nome,
                 idade,
                 cidade,
-                clienteExistente.getEndereco()
+                existente.getEndereco()
         );
 
-        if (controller.atualizar(clienteAtualizado)) {
-            System.out.println("\n[SUCESSO] Cliente ID " + id + " atualizado.");
-        } else {
-            System.out.println("\n[FALHA] Não foi possível atualizar o cliente.");
-        }
-    }
-
-    public static void deletar(Scanner sc, ClienteController controller) throws SQLException {
-        System.out.println("\n--- Deletar Cliente ---");
-        System.out.print("ID do Cliente a ser deletado: ");
-        if (!sc.hasNextInt()) {
-            System.out.println("[ERRO] ID deve ser um número.");
-            sc.nextLine();
-            return;
-        }
-        int id = sc.nextInt();
-        sc.nextLine();
-
-        if (controller.deletar(id)) {
-            System.out.println("\n[SUCESSO] Cliente ID " + id +
-                    " deletado (e seu endereço, via ON DELETE CASCADE).");
-        } else {
-            System.out.println("\n[FALHA] Cliente ID " + id +
-                    " não encontrado ou erro ao deletar.");
-        }
+        controller.atualizar(atualizado);
+        System.out.println("Cliente atualizado!");
     }
 }
